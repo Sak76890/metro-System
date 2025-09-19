@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="PuneMetroManagementSystem" default="default" basedir=".">
+    <description>Pune Metro Management System - NetBeans Ant Project by Sakshi</description>
+    
+    <!-- Project Properties -->
+    <property name="src.dir" value="src"/>
+    <property name="build.dir" value="build"/>
+    <property name="build.classes.dir" value="${build.dir}/classes"/>
+    <property name="dist.dir" value="dist"/>
+    <property name="lib.dir" value="lib"/>
+    <property name="javac.source" value="17"/>
+    <property name="javac.target" value="17"/>
+    <property name="main.class" value="com.sakshi.pune.metro.management.system.PuneMetroManagementSystem"/>
+    
+    <!-- Classpath -->
+    <path id="classpath">
+        <fileset dir="${lib.dir}" includes="**/*.jar"/>
+    </path>
+    
+    <!-- Initialize directories -->
+    <target name="init">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${build.classes.dir}"/>
+        <mkdir dir="${dist.dir}"/>
+        <mkdir dir="${lib.dir}"/>
+        <mkdir dir="logs"/>
+    </target>
+    
+    <!-- Clean build artifacts -->
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
+    </target>
+    
+    <!-- Compile source files -->
+    <target name="compile" depends="init">
+        <javac srcdir="${src.dir}" 
+               destdir="${build.classes.dir}"
+               source="${javac.source}"
+               target="${javac.target}"
+               includeantruntime="false"
+               encoding="UTF-8">
+            <classpath refid="classpath"/>
+        </javac>
+        
+        <!-- Copy resources -->
+        <copy todir="${build.classes.dir}">
+            <fileset dir="${src.dir}" excludes="**/*.java"/>
+        </copy>
+    </target>
+    
+    <!-- Create executable JAR -->
+    <target name="jar" depends="compile">
+        <jar destfile="${dist.dir}/PuneMetroManagementSystem.jar" basedir="${build.classes.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="${main.class}"/>
+                <attribute name="Class-Path" value="lib/mysql-connector-j-8.2.0.jar"/>
+                <attribute name="Implementation-Title" value="Pune Metro Management System"/>
+                <attribute name="Implementation-Version" value="1.0"/>
+                <attribute name="Implementation-Vendor" value="Sakshi"/>
+                <attribute name="Built-By" value="Sakshi"/>
+                <attribute name="Built-Date" value="${TODAY}"/>
+            </manifest>
+        </jar>
+        
+        <!-- Copy libraries to dist -->
+        <mkdir dir="${dist.dir}/lib"/>
+        <copy todir="${dist.dir}/lib">
+            <fileset dir="${lib.dir}"/>
+        </copy>
+        
+        <!-- Copy database properties -->
+        <copy file="src/database.properties" todir="${dist.dir}" failonerror="false"/>
+        
+        <echo message="✅ JAR file created: ${dist.dir}/PuneMetroManagementSystem.jar"/>
+        <echo message="🚇 Pune Metro Management System by Sakshi - Build Complete!"/>
+    </target>
+    
+    <!-- Run the application -->
+    <target name="run" depends="compile">
+        <java classname="${main.class}" fork="true">
+            <classpath>
+                <path refid="classpath"/>
+                <pathelement path="${build.classes.dir}"/>
+            </classpath>
+        </java>
+    </target>
+    
+    <!-- Generate Javadoc -->
+    <target name="javadoc" depends="init">
+        <mkdir dir="${dist.dir}/javadoc"/>
+        <javadoc sourcepath="${src.dir}"
+                 destdir="${dist.dir}/javadoc"
+                 packagenames="com.sakshi.pune.metro.management.system.*"
+                 author="true"
+                 version="true"
+                 use="true"
+                 windowtitle="Pune Metro Management System API">
+            <classpath refid="classpath"/>
+            <doctitle><![CDATA[<h1>Pune Metro Management System by Sakshi</h1>]]></doctitle>
+        </javadoc>
+        <echo message="📚 Javadoc generated in ${dist.dir}/javadoc"/>
+    </target>
+    
+    <!-- Default target -->
+    <target name="default" depends="jar"/>
+    
+</project>
